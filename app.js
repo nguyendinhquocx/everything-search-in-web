@@ -9,10 +9,25 @@ window.addEventListener('load', () => {
     updateClearButton();
 });
 
-// Search on Enter key
+// Search on Enter key and Ctrl+Enter for Google
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
-        performSearch();
+        // Ctrl/Cmd + Enter = Search Google
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            searchGoogleWithCurrentInput();
+        } else {
+            // Regular Enter = Search Everything
+            performSearch();
+        }
+    }
+});
+
+// Also handle keydown for better Ctrl+Enter detection
+document.getElementById('searchInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        searchGoogleWithCurrentInput();
     }
 });
 
@@ -118,7 +133,22 @@ function applyQuickFilter(filter) {
     showInIframe(searchUrl, combinedQuery);
 }
 
-// Search Google function
+// Search Google with current input (for Ctrl+Enter)
+function searchGoogleWithCurrentInput() {
+    const searchInput = document.getElementById('searchInput');
+    const query = searchInput.value.trim();
+    
+    if (query) {
+        // Use the actual input value (may include filters) for Google search
+        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        window.open(googleUrl, '_blank');
+    } else {
+        // If no query, just open Google
+        window.open('https://www.google.com', '_blank');
+    }
+}
+
+// Search Google function (for button click)
 function searchGoogle() {
     const query = currentUserQuery.trim();
     if (query) {
