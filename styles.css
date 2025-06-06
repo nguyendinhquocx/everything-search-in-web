@@ -34,24 +34,12 @@ body {
     padding: 0 16px;
 }
 
-/* Search Section - Fixed when results shown */
+/* Search Section */
 .search-section {
     position: relative;
-    padding: 32px 0 24px;
+    padding: 32px 0 20px; /* Reduced bottom padding */
     text-align: center;
     transition: all 0.3s ease;
-}
-
-.search-section.fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-primary);
-    z-index: 100;
-    padding: 16px 0;
-    box-shadow: var(--shadow);
-    border-bottom: 1px solid var(--border-color);
 }
 
 .search-wrapper {
@@ -73,7 +61,7 @@ body {
 
 .search-input {
     width: 100%;
-    padding: 12px 60px 12px 20px;
+    padding: 12px 100px 12px 20px; /* More padding for both buttons */
     border: none;
     outline: none;
     font-size: 16px;
@@ -85,6 +73,43 @@ body {
     color: var(--text-muted);
 }
 
+/* Clear button - positioned left of search button */
+.clear-btn {
+    position: absolute;
+    right: 48px; /* Left of search button */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+}
+
+.clear-btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    opacity: 1;
+}
+
+.clear-btn.visible {
+    display: flex;
+}
+
+.clear-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
+
+/* Search button */
 .search-btn {
     position: absolute;
     right: 8px;
@@ -114,21 +139,17 @@ body {
     fill: currentColor;
 }
 
-/* Quick Actions */
+/* Quick Actions - Now 6 items in one row */
 .quick-actions {
-    margin: 0 0 24px 0;
+    margin: 0 0 16px 0; /* Reduced bottom margin */
     transition: all 0.3s ease;
-}
-
-.quick-actions.with-results {
-    margin-top: 80px; /* Space for fixed search */
 }
 
 .quick-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 16px;
-    max-width: 800px;
+    max-width: 900px; /* Increased max width for 6 items */
     margin: 0 auto;
 }
 
@@ -170,12 +191,12 @@ body {
     color: var(--text-primary);
 }
 
-/* Results Container - Full width, no borders */
+/* Results Container - Moved up with larger size */
 .iframe-container {
     background: var(--bg-primary);
     border-radius: var(--radius);
     overflow: hidden;
-    margin: 12px 0;
+    margin: 8px 0; /* Reduced top margin */
     display: none;
     width: 100vw;
     margin-left: calc(50% - 50vw);
@@ -189,7 +210,6 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    /* Removed border */
 }
 
 .iframe-title {
@@ -235,15 +255,10 @@ body {
 
 .everything-iframe {
     width: 100%;
-    height: calc(100vh - 160px);
-    min-height: 700px;
+    height: calc(100vh - 120px); /* Increased height */
+    min-height: 750px; /* Increased min height */
     border: none;
     background: var(--bg-primary);
-}
-
-/* Spacing when search is fixed */
-.content-spacing {
-    padding-top: 80px;
 }
 
 @media (max-width: 768px) {
@@ -255,31 +270,20 @@ body {
         padding: 24px 0 16px;
     }
     
-    .search-section.fixed {
-        padding: 12px 0;
-    }
-    
-    .quick-actions.with-results {
-        margin-top: 70px;
-    }
-    
     .quick-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
+        max-width: 600px;
     }
     
     .everything-iframe {
-        height: calc(100vh - 140px);
+        height: calc(100vh - 100px);
         min-height: 500px;
     }
     
     .iframe-container {
         margin-left: calc(50% - 50vw + 12px);
         width: calc(100vw - 24px);
-    }
-    
-    .content-spacing {
-        padding-top: 70px;
     }
 }
 
@@ -295,5 +299,9 @@ body {
     
     .quick-title {
         font-size: 12px;
+    }
+    
+    .search-input {
+        padding: 12px 90px 12px 16px;
     }
 }
