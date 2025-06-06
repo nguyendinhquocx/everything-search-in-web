@@ -1,29 +1,26 @@
 // Global variables
 let currentUserQuery = '';
 let currentFilter = '';
+let selectedDrives = new Set(); // Use Set to track multiple selected drives
 let hasResults = false;
 
 // Initialize when page loads
 window.addEventListener('load', () => {
     document.getElementById('searchInput').focus();
-    updateClearButton();
 });
 
 // Search on Enter key and Ctrl+Enter for Google
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
-        // Ctrl/Cmd + Enter = Search Google
         if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
             searchGoogleWithCurrentInput();
         } else {
-            // Regular Enter = Search Everything
             performSearch();
         }
     }
 });
 
-// Also handle keydown for better Ctrl+Enter detection
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -31,14 +28,11 @@ document.getElementById('searchInput').addEventListener('keydown', function(e) {
     }
 });
 
-// Show/hide clear button based on input content
+// Update current user query when input changes
 document.getElementById('searchInput').addEventListener('input', function() {
-    updateClearButton();
-    
     const query = this.value.trim();
     currentUserQuery = cleanUserQuery(query);
     
-    // If user clears input, close results
     if (query === '' && hasResults) {
         setTimeout(() => {
             if (this.value.trim() === '') {
@@ -50,49 +44,60 @@ document.getElementById('searchInput').addEventListener('input', function() {
     }
 });
 
-// Update clear button visibility
-function updateClearButton() {
-    const clearBtn = document.getElementById('clearBtn');
-    const searchInput = document.getElementById('searchInput');
+// Toggle drive selection - new logic
+function toggleDrive(drive) {
+    const checkbox = document.getElementById(`drive${drive.replace(':', '')}`);
     
-    if (searchInput.value.trim() !== '') {
-        clearBtn.classList.add('visible');
+    if (selectedDrives.has(drive)) {
+        // If already selected, unselect it
+        selectedDrives.delete(drive);
+        checkbox.classList.remove('active');
     } else {
-        clearBtn.classList.remove('visible');
+        // If not selected, select it
+        selectedDrives.add(drive);
+        checkbox.classList.add('active');
+    }
+    
+    // Re-search if there are current results
+    if (hasResults) {
+        performSearch();
     }
 }
 
-// Clear search function
-function clearSearch() {
-    const searchInput = document.getElementById('searchInput');
-    searchInput.value = '';
-    searchInput.focus();
-    updateClearButton();
-    closeIframe();
-    currentUserQuery = '';
-    currentFilter = '';
+// Get current drive filter string
+function getDriveFilter() {
+    if (selectedDrives.size === 0) {
+        return ''; // No drives selected = search all
+    }
+    
+    // Create filter string for selected drives
+    return Array.from(selectedDrives).join(' ');
 }
 
 // Main search function
 function performSearch() {
     const query = document.getElementById('searchInput').value.trim();
     
-    // If empty query, close results and return
     if (!query) {
         closeIframe();
         return;
     }
     
-    // Update user query (remove any existing filters)
     currentUserQuery = cleanUserQuery(query);
     
-    const searchUrl = `http://localhost:8080/?s=${encodeURIComponent(query)}`;
-    showInIframe(searchUrl, query);
+    // Add drive filter if any drives are selected
+    let finalQuery = query;
+    const driveFilter = getDriveFilter();
+    if (driveFilter) {
+        finalQuery = `${driveFilter} ${query}`;
+    }
+    
+    const searchUrl = `http://localhost:8080/?s=${encodeURIComponent(finalQuery)}`;
+    showInIframe(searchUrl, finalQuery);
 }
 
 // Clean user query by removing filter patterns
 function cleanUserQuery(query) {
-    // Remove filter patterns like *.ext|*.ext2, size:, dm:, folder:
     let cleaned = query;
     
     // Remove file extension patterns
@@ -107,6 +112,9 @@ function cleanUserQuery(query) {
     // Remove folder filters
     cleaned = cleaned.replace(/folder:/g, '');
     
+    // Remove drive filters
+    cleaned = cleaned.replace(/[A-Z]:/g, '');
+    
     // Clean up extra spaces
     cleaned = cleaned.replace(/\s+/g, ' ').trim();
     
@@ -115,87 +123,67 @@ function cleanUserQuery(query) {
 
 // Apply quick filter while preserving user query
 function applyQuickFilter(filter) {
-    // Store the new filter
     currentFilter = filter;
     
     let combinedQuery = '';
     
-    // If user has entered a query, combine it with the filter
     if (currentUserQuery.trim()) {
         combinedQuery = `${filter} ${currentUserQuery.trim()}`;
     } else {
-        // If no user query, just use the filter
         combinedQuery = filter;
     }
     
-    // Perform search with combined query but don't show filter in input
+    // Add drive filter if any drives are selected
+    const driveFilter = getDriveFilter();
+    if (driveFilter) {
+        combinedQuery = `${driveFilter} ${combinedQuery}`;
+    }
+    
     const searchUrl = `http://localhost:8080/?s=${encodeURIComponent(combinedQuery)}`;
     showInIframe(searchUrl, combinedQuery);
 }
 
-// Search Google with current input (for Ctrl+Enter)
+// Search Google with current input
 function searchGoogleWithCurrentInput() {
     const searchInput = document.getElementById('searchInput');
     const query = searchInput.value.trim();
     
     if (query) {
-        // Use the actual input value (may include filters) for Google search
         const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
         window.open(googleUrl, '_blank');
     } else {
-        // If no query, just open Google
         window.open('https://www.google.com', '_blank');
     }
 }
 
-// Search Google function (for button click)
-function searchGoogle() {
-    const query = currentUserQuery.trim();
-    if (query) {
-        const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-        window.open(googleUrl, '_blank');
-    } else {
-        // If no query, just open Google
-        window.open('https://www.google.com', '_blank');
-    }
-}
-
-// Show results in iframe with CSS injection to hide Everything header
+// Show results in iframe
 function showInIframe(url, query) {
     const container = document.getElementById('iframeContainer');
     const iframe = document.getElementById('everythingFrame');
     const urlDisplay = document.getElementById('iframeUrl');
     
-    // Show iframe
     container.style.display = 'block';
     iframe.src = url;
     urlDisplay.textContent = url.replace('http://', '');
     
-    // Inject CSS to hide Everything header after iframe loads
     iframe.onload = function() {
         try {
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
             
-            // Create style element to hide Everything header and search
             const style = iframeDoc.createElement('style');
             style.textContent = `
-                /* Hide Everything header and search */
                 h1 { display: none !important; }
                 input[type="text"] { display: none !important; }
                 form { display: none !important; }
-                /* Keep only results table */
                 body > * { display: none !important; }
                 table, .results { display: table !important; }
-                /* Show results content */
                 body > table:last-of-type { display: table !important; }
                 body > div:last-child { display: block !important; }
-                /* Clean up layout */
                 body { padding: 10px !important; margin: 0 !important; }
             `;
             
             iframeDoc.head.appendChild(style);
         } catch (e) {
-            // Cross-origin restrictions - can't inject CSS
             console.log('Cannot inject CSS due to CORS restrictions');
         }
     };
@@ -208,15 +196,110 @@ function closeIframe() {
     const container = document.getElementById('iframeContainer');
     const iframe = document.getElementById('everythingFrame');
     
-    // Hide iframe
     container.style.display = 'none';
     iframe.src = '';
     iframe.onload = null;
     
-    // Reset state
     hasResults = false;
     currentFilter = '';
 }
+
+// URL Converter functions
+function openUrlConverter() {
+    document.getElementById('urlConverterModal').classList.add('open');
+    document.getElementById('urlInput').focus();
+}
+
+function closeUrlConverter() {
+    document.getElementById('urlConverterModal').classList.remove('open');
+    document.getElementById('urlInput').value = '';
+    document.getElementById('pathOutput').value = '';
+    resetCopyButton();
+}
+
+function pasteFromClipboard() {
+    navigator.clipboard.readText()
+        .then(text => {
+            document.getElementById('urlInput').value = text;
+            convertUrl();
+        })
+        .catch(err => {
+            console.error('Cannot read clipboard: ', err);
+        });
+}
+
+function convertUrl() {
+    const urlInput = document.getElementById('urlInput');
+    const pathOutput = document.getElementById('pathOutput');
+    const url = urlInput.value.trim();
+    
+    if (!url) {
+        pathOutput.value = '';
+        return;
+    }
+    
+    const localPath = convertUrlToLocalPath(url);
+    pathOutput.value = localPath;
+}
+
+function convertUrlToLocalPath(url) {
+    let result = url;
+    
+    if (url.startsWith('local-file-open://')) {
+        result = decodeURIComponent(url.replace('local-file-open://', ''));
+    } else if (url.includes('localhost') && url.includes('%3A')) {
+        const urlParts = url.split('localhost:');
+        if (urlParts.length > 1) {
+            const portAndPath = urlParts[1];
+            const pathStart = portAndPath.indexOf('/', 0);
+            if (pathStart !== -1) {
+                const pathPart = portAndPath.substring(pathStart + 1);
+                result = decodeURIComponent(pathPart.replace('%3A', ':'));
+            }
+        }
+    }
+    
+    return result.replace(/\//g, '\\');
+}
+
+function copyToClipboard() {
+    const pathOutput = document.getElementById('pathOutput');
+    const copyBtn = document.getElementById('copyBtn');
+    
+    if (!pathOutput.value) {
+        return;
+    }
+    
+    navigator.clipboard.writeText(pathOutput.value)
+        .then(() => {
+            copyBtn.innerHTML = `
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+            `;
+            copyBtn.style.color = '#4caf50';
+            
+            setTimeout(() => {
+                resetCopyButton();
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Cannot copy to clipboard: ', err);
+        });
+}
+
+function resetCopyButton() {
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn.innerHTML = `
+        <svg viewBox="0 0 24 24">
+            <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
+        </svg>
+    `;
+    copyBtn.style.color = '';
+}
+
+// Auto-convert when typing in URL input
+document.getElementById('urlInput').addEventListener('input', convertUrl);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
@@ -226,18 +309,25 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('searchInput').focus();
     }
     
-    // Escape to close iframe or clear search
+    // Escape to close modals or iframe
     if (e.key === 'Escape') {
-        if (hasResults) {
+        if (document.getElementById('urlConverterModal').classList.contains('open')) {
+            closeUrlConverter();
+        } else if (hasResults) {
             closeIframe();
-        } else {
-            clearSearch();
         }
+    }
+    
+    // Ctrl+Shift+C to open URL converter
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+        e.preventDefault();
+        openUrlConverter();
     }
 });
 
-// Handle Everything Web link - always open clean
-document.querySelector('a[href="http://localhost:8080"]').addEventListener('click', function(e) {
-    e.preventDefault();
-    window.open('http://localhost:8080', '_blank');
+// Close modal when clicking overlay
+document.getElementById('urlConverterModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeUrlConverter();
+    }
 });
