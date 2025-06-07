@@ -14,10 +14,87 @@
             <div class="search-wrapper">
                 <div class="search-icon">
                     <svg viewBox="0 0 24 24">
-                        <path d="M15.5 14h-.79l-.28-.27c.98-1.14 1.57-2.62 1.57-4.23 0-3.59-2.91-6.5-6.5-6.5s-6.5 2.91-6.5 6.5 2.91 6.5 6.5 6.5c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        <path d="M15.5 14h-.79l-.28-.27c.98-1.14 1.57-2.62 1.57-4.23 0-3.59-2.91-6.5-6.5-6.5s-6.5 2.91-6.5 6.5 2.91 6.5 6.5 6.5c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0c-2.49 0-4.5-2.01-4.5-4.5s2.01-4.5 4.5-4.5 4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z"/>
                     </svg>
                 </div>
-                <input type="text" class="search-input" placeholder="Gõ để tìm kiếm" id="searchInput" autocomplete="off" title="Enter: Tìm trong Everything | Ctrl+Enter: Tìm trên Google">
+                <input type="text" class="search-input" placeholder="Tìm kiếm" id="searchInput" autocomplete="off" title="Enter: Tìm kiếm hoặc Convert URL | Ctrl+Enter: Tìm Google">
+                
+                <!-- Date Filter -->
+                <div class="date-filter" id="dateFilter">
+                    <button class="date-btn" onclick="toggleDateDropdown()" title="Lọc theo ngày" id="dateBtn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                        </svg>
+                        <span id="selectedDateText">Tất cả</span>
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="date-dropdown" id="dateDropdown">
+                        <!-- Quick Date Options -->
+                        <div class="date-section">
+                            <div class="section-title">Nhanh</div>
+                            <div class="date-option active" onclick="selectQuickDate('all', 'Tất cả')">
+                                <span>Tất cả thời gian</span>
+                            </div>
+                            <div class="date-option" onclick="selectQuickDate('today', 'Hôm nay')">
+                                <span>Hôm nay</span>
+                                <small id="todayDate"></small>
+                            </div>
+                            <div class="date-option" onclick="selectQuickDate('thisweek', 'Tuần này')">
+                                <span>Tuần này</span>
+                                <small id="thisWeekRange"></small>
+                            </div>
+                            <div class="date-option" onclick="selectQuickDate('thismonth', 'Tháng này')">
+                                <span>Tháng này</span>
+                                <small id="thisMonthRange"></small>
+                            </div>
+                            <div class="date-option" onclick="selectQuickDate('thisyear', 'Năm này')">
+                                <span>Năm này</span>
+                                <small>2025</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Custom Date Range -->
+                        <div class="date-section">
+                            <div class="section-title">Tùy chỉnh</div>
+                            <div class="custom-date-options">
+                                <div class="date-range-type">
+                                    <label>
+                                        <input type="radio" name="dateType" value="range" checked onchange="updateDateInputs()">
+                                        <span>Trong khoảng</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="dateType" value="after" onchange="updateDateInputs()">
+                                        <span>Sau ngày</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="dateType" value="before" onchange="updateDateInputs()">
+                                        <span>Trước ngày</span>
+                                    </label>
+                                </div>
+                                
+                                <div class="date-inputs" id="dateInputs">
+                                    <div class="date-input-group">
+                                        <label>Từ ngày:</label>
+                                        <input type="date" id="startDate" onchange="updateCustomDate()">
+                                    </div>
+                                    <div class="date-input-group">
+                                        <label>Đến ngày:</label>
+                                        <input type="date" id="endDate" onchange="updateCustomDate()">
+                                    </div>
+                                </div>
+                                
+                                <div class="date-actions">
+                                    <button class="btn-apply" onclick="applyCustomDate()">Áp dụng</button>
+                                    <button class="btn-clear" onclick="clearDateFilter()">Xóa bộ lọc</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drive Selector -->
                 <div class="drive-selector" id="driveSelector">
                     <div class="drive-option" data-drive="D:" onclick="toggleDrive('D:')">
                         <div class="drive-checkbox" id="driveD">
@@ -39,7 +116,7 @@
             </div>
         </div>
         
-        <!-- Quick Actions - 5 items -->
+        <!-- Quick Actions - Chỉ còn 4 items, loại bỏ Convert URL -->
         <section class="quick-actions" id="quickActions">
             <div class="quick-grid">
                 <a href="#" class="quick-item" onclick="applyQuickFilter('*.jpg|*.png|*.gif|*.webp')">
@@ -77,34 +154,35 @@
                     </div>
                     <div class="quick-title">Thư mục</div>
                 </a>
-                
-                <a href="#" class="quick-item" onclick="openUrlConverter()">
-                    <div class="quick-icon">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12Z"/>
-                        </svg>
-                    </div>
-                    <div class="quick-title">Convert URL</div>
-                </a>
             </div>
         </section>
         
         <!-- Results -->
         <div class="iframe-container" id="iframeContainer">
             <div class="iframe-header">
-                <div class="iframe-title">Kết quả tìm kiếm</div>
-                <div class="iframe-url" id="iframeUrl">localhost:8080</div>
-                <button class="iframe-close" onclick="closeIframe()" title="Đóng">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                </button>
+                <!-- <div class="iframe-title">Kết quả tìm kiếm</div>
+                <div class="iframe-url" id="iframeUrl">localhost:8080</div> -->
+                <div class="iframe-actions">
+                    <button class="iframe-fullscreen" onclick="toggleFullscreen()" title="Toàn màn hình" id="fullscreenBtn">
+                        <svg viewBox="0 0 24 24" class="expand-icon">
+                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                        </svg>
+                        <svg viewBox="0 0 24 24" class="collapse-icon" style="display: none;">
+                            <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+                        </svg>
+                    </button>
+                    <button class="iframe-close" onclick="closeIframe()" title="Đóng">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
             <iframe class="everything-iframe" id="everythingFrame" src=""></iframe>
         </div>
     </div>
     
-    <!-- URL Converter Modal -->
+    <!-- URL Converter Modal - Giữ lại cho legacy support -->
     <div class="modal-overlay" id="urlConverterModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -119,7 +197,7 @@
                 <div class="input-group">
                     <label for="urlInput">Paste Everything URL:</label>
                     <div class="input-wrapper">
-                        <input type="text" id="urlInput" placeholder="http://localhost:8080/D%3A/path/to/file.txt" />
+                        <input type="text" id="urlInput" placeholder="Paste URL và nhấn Enter..." />
                         <button class="paste-btn" onclick="pasteFromClipboard()" title="Paste">
                             <svg viewBox="0 0 24 24">
                                 <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
@@ -130,17 +208,20 @@
                 <div class="input-group">
                     <label for="pathOutput">Local Path:</label>
                     <div class="input-wrapper">
-                        <input type="text" id="pathOutput" readonly placeholder="D:\path\to\file.txt" />
-                        <button class="copy-btn" onclick="copyToClipboard()" title="Copy" id="copyBtn">
-                            <svg viewBox="0 0 24 24">
+                        <input type="text" id="pathOutput" readonly placeholder="Converted path will appear here..." />
+                        <div class="copy-status" id="copyStatus">
+                            <svg class="copy-icon" viewBox="0 0 24 24">
                                 <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"/>
                             </svg>
-                        </button>
+                            <svg class="check-icon" viewBox="0 0 24 24" style="display: none;">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            <span class="status-text">Ready</span>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-actions">
-                    <button class="btn-primary" onclick="convertUrl()">Convert</button>
-                    <button class="btn-secondary" onclick="closeUrlConverter()">Close</button>
+                <div class="usage-hint">
+                    <p><strong>Tip:</strong> Paste URL và nhấn <kbd>Enter</kbd> để convert và copy tự động</p>
                 </div>
             </div>
         </div>

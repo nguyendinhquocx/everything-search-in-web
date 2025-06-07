@@ -7,18 +7,20 @@
 :root {
     --primary-color: #000000;
     --secondary-color: #f7f7f8;
-    --accent-color: #10a37f;
-    --border-color: #e0e0e0; /* Lighter gray border */
+    --accent-color: #000000; /* ChatGPT-style blue */
+    --success-color: #000000;
+    --border-color: #e0e0e0;
     --text-primary: #000000;
     --text-secondary: #676767;
-    --text-muted: #9aa0a6; /* Google-style gray */
+    --text-muted: #9aa0a6;
     --bg-primary: #ffffff;
     --bg-secondary: #f7f7f8;
-    --shadow: 0 2px 5px 1px rgba(64,60,67,.16); /* Google-style shadow */
+    --hover-bg: #f3f4f6; /* Light gray hover like ChatGPT */
+    --shadow: 0 2px 5px 1px rgba(64,60,67,.16);
     --shadow-hover: 0 4px 8px 2px rgba(64,60,67,.20);
     --radius: 12px;
     --radius-sm: 6px;
-    --radius-full: 24px; /* Google-style radius */
+    --radius-full: 24px;
 }
 
 body {
@@ -45,11 +47,11 @@ body {
 .search-wrapper {
     position: relative;
     background: var(--bg-primary);
-    border: 1px solid var(--border-color); /* Light gray border */
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-full);
-    padding: 12px 16px; /* Google-style padding */
+    padding: 12px 16px;
     transition: all 0.2s ease;
-    box-shadow: var(--shadow); /* Google-style shadow */
+    box-shadow: var(--shadow);
     max-width: 600px;
     margin: 0 auto;
     display: flex;
@@ -66,7 +68,7 @@ body {
     box-shadow: var(--shadow-hover);
 }
 
-/* Search icon - Google style left position */
+/* Search icon */
 .search-icon {
     display: flex;
     align-items: center;
@@ -79,7 +81,7 @@ body {
 .search-icon svg {
     width: 20px;
     height: 20px;
-    fill: var(--text-muted); /* Light gray like Google */
+    fill: var(--text-muted);
 }
 
 .search-input {
@@ -89,14 +91,247 @@ body {
     font-size: 16px;
     background: transparent;
     color: var(--text-primary);
-    min-width: 0; /* Allow flex shrinking */
+    min-width: 0;
 }
 
 .search-input::placeholder {
     color: var(--text-muted);
 }
 
-/* Drive Selector - moved to right */
+/* Date Filter - ChatGPT-inspired */
+.date-filter {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.date-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.date-btn:hover {
+    background: var(--hover-bg); /* Light gray hover */
+    color: var(--text-secondary);
+}
+
+.date-btn.open {
+    background: var(--hover-bg);
+    color: var(--text-secondary);
+}
+
+/* Active state - only blue text, no background */
+.date-btn.active {
+    background: transparent;
+    color: var(--accent-color); /* Blue text */
+}
+
+.date-btn.active:hover {
+    background: var(--hover-bg); /* Still allow hover effect */
+    color: var(--accent-color);
+}
+
+.date-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+}
+
+.dropdown-arrow {
+    width: 12px !important;
+    height: 12px !important;
+    transition: transform 0.2s ease;
+}
+
+.date-btn.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.date-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    min-width: 280px;
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.date-dropdown.open {
+    display: block;
+}
+
+.date-section {
+    padding: 12px 0;
+}
+
+.date-section:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0 16px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Date Options - ChatGPT style */
+.date-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.date-option:hover {
+    background: var(--hover-bg); /* Light gray hover only */
+}
+
+/* Active state - blue text only, no background */
+.date-option.active {
+    background: transparent;
+    color: var(--accent-color); /* Blue text */
+}
+
+.date-option.active:hover {
+    background: var(--hover-bg); /* Allow hover effect even when active */
+    color: var(--accent-color);
+}
+
+.date-option span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.date-option small {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* Custom Date Options */
+.custom-date-options {
+    padding: 0 16px;
+}
+
+.date-range-type {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.date-range-type label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 6px 0;
+    transition: all 0.2s ease;
+    border-radius: var(--radius-sm);
+}
+
+.date-range-type label:hover {
+    background: var(--hover-bg);
+}
+
+.date-range-type input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    accent-color: var(--accent-color);
+}
+
+.date-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.date-input-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.date-input-group input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.date-input-group input[type="date"]:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.date-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-apply, .btn-clear {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-apply {
+    background: var(--accent-color); /* Blue button */
+    color: white;
+}
+
+.btn-apply:hover {
+    background: #000000; /* Darker blue on hover */
+}
+
+.btn-clear {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-clear:hover {
+    background: var(--hover-bg);
+}
+
+/* Drive Selector - ChatGPT style */
 .drive-selector {
     display: flex;
     gap: 8px;
@@ -115,7 +350,7 @@ body {
 }
 
 .drive-option:hover {
-    background: var(--bg-secondary);
+    background: var(--hover-bg); /* Light gray hover */
 }
 
 .drive-checkbox {
@@ -131,8 +366,8 @@ body {
 }
 
 .drive-checkbox.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
+    background: var(--accent-color); /* Blue background for checkbox */
+    border-color: var(--accent-color);
 }
 
 .check-icon {
@@ -154,7 +389,12 @@ body {
     min-width: 20px;
 }
 
-/* Quick Actions - 5 items */
+/* Drive option active state - blue text */
+.drive-option.active span {
+    color: var(--accent-color);
+}
+
+/* Quick Actions - ChatGPT style */
 .quick-actions {
     margin: 0 0 16px 0;
     transition: all 0.3s ease;
@@ -162,9 +402,9 @@ body {
 
 .quick-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr); /* Thay đổi từ 5 thành 4 */
     gap: 16px;
-    max-width: 750px;
+    max-width: 600px; /* Giảm max-width */
     margin: 0 auto;
 }
 
@@ -181,7 +421,7 @@ body {
 }
 
 .quick-item:hover {
-    background: var(--bg-secondary);
+    background: var(--hover-bg); /* Light gray hover */
     transform: translateY(-2px);
 }
 
@@ -206,7 +446,7 @@ body {
     color: var(--text-primary);
 }
 
-/* Results Container */
+/* Simplified iframe container */
 .iframe-container {
     background: var(--bg-primary);
     border-radius: var(--radius);
@@ -216,36 +456,62 @@ body {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     max-width: none;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color); /* Thêm border tổng thể */
 }
 
+.iframe-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    border: none; /* Bỏ border khi fullscreen */
+}
+
+/* Updated iframe header styles */
 .iframe-header {
     background: var(--bg-primary);
-    padding: 12px 16px;
+    padding: 8px 16px; /* Giảm padding từ 12px xuống 8px cho gọn hơn */
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: flex-end; /* Chuyển icons sang phải */
+    gap: 8px;
+    /* Bỏ border-bottom */
+    /* border-bottom: 1px solid var(--border-color); */
+    box-shadow: none; /* Bỏ shadow cũng */
 }
 
-.iframe-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    flex: 1;
+.iframe-container.fullscreen .iframe-header {
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+    background: var(--bg-primary);
+    /* Bỏ border-bottom cho fullscreen mode */
+    /* border-bottom: 1px solid var(--border-color); */
 }
 
+/* Remove unused styles since title and url are removed */
+.iframe-title,
 .iframe-url {
-    font-size: 12px;
-    color: var(--text-muted);
-    background: var(--bg-secondary);
-    padding: 4px 8px;
-    border-radius: var(--radius-sm);
-    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    display: none; /* Ẩn hoàn toàn nếu còn sót lại */
 }
 
-.iframe-close {
-    width: 24px;
-    height: 24px;
+.iframe-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto; /* Đẩy về phải nếu có content khác */
+}
+
+.iframe-fullscreen, .iframe-close {
+    width: 28px; /* Tăng size một chút để dễ click */
+    height: 28px;
     border: none;
     background: transparent;
     cursor: pointer;
@@ -257,14 +523,14 @@ body {
     transition: all 0.2s ease;
 }
 
-.iframe-close:hover {
-    background: var(--border-color);
+.iframe-fullscreen:hover, .iframe-close:hover {
+    background: var(--hover-bg);
     color: var(--text-primary);
 }
 
-.iframe-close svg {
-    width: 16px;
-    height: 16px;
+.iframe-fullscreen svg, .iframe-close svg {
+    width: 18px; /* Tăng size icon một chút */
+    height: 18px;
     fill: currentColor;
 }
 
@@ -276,7 +542,17 @@ body {
     background: var(--bg-primary);
 }
 
-/* URL Converter Modal */
+.iframe-container.fullscreen .everything-iframe {
+    height: calc(100vh - 44px); /* Điều chỉnh cho header nhỏ hơn */
+    min-height: unset;
+}
+
+body.fullscreen-active .search-section,
+body.fullscreen-active .quick-actions {
+    display: none;
+}
+
+/* URL Converter Modal styles remain similar but with ChatGPT colors */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -334,7 +610,7 @@ body {
 }
 
 .modal-close:hover {
-    background: var(--bg-secondary);
+    background: var(--hover-bg);
     color: var(--text-primary);
 }
 
@@ -378,8 +654,8 @@ body {
 
 .input-wrapper input:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 .input-wrapper input[readonly] {
@@ -387,7 +663,7 @@ body {
     color: var(--text-secondary);
 }
 
-.paste-btn, .copy-btn {
+.paste-btn {
     position: absolute;
     right: 8px;
     width: 32px;
@@ -403,50 +679,70 @@ body {
     justify-content: center;
 }
 
-.paste-btn:hover, .copy-btn:hover {
-    background: var(--border-color);
+.paste-btn:hover {
+    background: var(--hover-bg);
     color: var(--text-primary);
 }
 
-.paste-btn svg, .copy-btn svg {
+.paste-btn svg {
     width: 16px;
     height: 16px;
     fill: currentColor;
 }
 
-.modal-actions {
+.copy-status {
+    position: absolute;
+    right: 8px;
     display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 24px;
-}
-
-.btn-primary, .btn-secondary {
-    padding: 10px 20px;
-    border: none;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    font-size: 12px;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
 }
 
-.btn-primary {
-    background: var(--primary-color);
+.copy-status.copied {
+    background: var(--success-color);
     color: white;
 }
 
-.btn-primary:hover {
-    background: #333;
+.copy-status svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
 }
 
-.btn-secondary {
+.copy-status .check-icon {
+    color: white;
+}
+
+.usage-hint {
+    margin-top: 16px;
+    padding: 12px 16px;
     background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-color);
+}
+
+.usage-hint p {
+    margin: 0;
+    font-size: 13px;
     color: var(--text-secondary);
 }
 
-.btn-secondary:hover {
-    background: var(--border-color);
+.usage-hint kbd {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--text-primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 768px) {
@@ -468,8 +764,18 @@ body {
         height: 18px;
     }
     
+    .date-filter {
+        order: 3;
+    }
+    
     .drive-selector {
         gap: 6px;
+        order: 2;
+    }
+    
+    .date-dropdown {
+        min-width: 260px;
+        right: -20px;
     }
     
     .drive-option span {
@@ -488,19 +794,42 @@ body {
     }
     
     .quick-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr); /* 2 cột trên mobile */
         gap: 12px;
-        max-width: 500px;
+        max-width: 400px;
     }
     
+    .iframe-header {
+        padding: 6px 12px;
+    }
+
+    .iframe-fullscreen, .iframe-close {
+        width: 32px;
+        height: 32px;
+    }
+
+    .iframe-fullscreen svg, .iframe-close svg {
+        width: 20px;
+        height: 20px;
+    }
+
     .everything-iframe {
         height: calc(100vh - 100px);
         min-height: 500px;
     }
-    
+
     .iframe-container {
         margin-left: calc(50% - 50vw + 12px);
         width: calc(100vw - 24px);
+    }
+
+    .iframe-container.fullscreen {
+        margin-left: 0;
+        width: 100vw;
+    }
+
+    .iframe-container.fullscreen .everything-iframe {
+        height: calc(100vh - 44px);
     }
     
     .modal-content {
@@ -513,7 +842,11 @@ body {
     }
 }
 
+
 @media (max-width: 480px) {
+    .iframe-header {
+        padding: 4px 8px;
+    }
     .quick-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 8px;
@@ -525,6 +858,11 @@ body {
     
     .quick-title {
         font-size: 12px;
+    }
+    
+    .date-dropdown {
+        min-width: 240px;
+        right: -30px;
     }
     
     .drive-selector {
@@ -539,4 +877,66 @@ body {
     .search-wrapper {
         padding: 8px 10px;
     }
+}
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: var(--shadow-hover);
+    max-width: 350px;
+    word-wrap: break-word;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toast-success {
+    background: #10b981;
+}
+
+.toast-error {
+    background: #ef4444;
+}
+
+.toast-info {
+    background: var(--accent-color);
+}
+
+/* Enhanced search input states */
+.search-input.url-detected {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.search-input.convert-success {
+    color: var(--success-color);
+}
+
+/* Additional responsive improvements */
+@media (max-width: 768px) {
+    .toast {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100%);
+    }
+    
+    .toast.show {
+        transform: translateY(0);
+    }
+}
+
+/* Success color variable */
+:root {
+    --success-color: #10b981;
 }
