@@ -80,12 +80,13 @@ document.getElementById('searchInput').addEventListener('input', function() {
                 currentUserQuery = '';
                 currentFilter = '';
                 resetSearchVisual();
+                resetQuickFilterUI();
             }
         }, 100);
     }
 });
 
-// NEW: Handle search or convert based on input
+// Handle search or convert based on input
 function handleSearchOrConvert(query) {
     if (!query) {
         closeIframe();
@@ -96,17 +97,17 @@ function handleSearchOrConvert(query) {
         // Convert URL
         convertUrlDirectly(query);
     } else {
-        // Normal search
-        performSearch();
+        // Normal unified search
+        performUnifiedSearch();
     }
 }
 
-// NEW: Check if input is localhost URL
+// Check if input is localhost URL
 function isLocalhostUrl(input) {
     return input.includes('localhost') || input.startsWith('local-file-open://');
 }
 
-// NEW: Convert URL directly and copy to clipboard
+// Convert URL directly and copy to clipboard
 function convertUrlDirectly(url) {
     const localPath = convertUrlToLocalPath(url);
     
@@ -125,7 +126,7 @@ function convertUrlDirectly(url) {
     }
 }
 
-// NEW: Visual feedback for URL detection
+// Visual feedback for URL detection
 function updateSearchVisualFeedback(query) {
     const searchIcon = document.querySelector('.search-icon svg');
     const searchInput = document.getElementById('searchInput');
@@ -133,9 +134,9 @@ function updateSearchVisualFeedback(query) {
     if (isLocalhostUrl(query)) {
         // Change to convert icon
         searchIcon.innerHTML = `
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M16.5,11H13V7.5L11,9.5L13,11.5V8H16.5V11Z"/>
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M16.5,11H13V7.5L10.75,9.75L9.33,8.33L13.83,3.83L18.33,8.33L16.91,9.75L14.5,7.5V11H16.5Z"/>
         `;
-        searchInput.placeholder = 'Tìm kiếm';
+        searchInput.placeholder = 'Nhấn Enter để convert URL';
         searchIcon.style.fill = 'var(--accent-color)';
         searchInput.style.color = 'var(--accent-color)';
     } else {
@@ -143,7 +144,7 @@ function updateSearchVisualFeedback(query) {
     }
 }
 
-// NEW: Reset search visual to default
+// Reset search visual to default
 function resetSearchVisual() {
     const searchIcon = document.querySelector('.search-icon svg');
     const searchInput = document.getElementById('searchInput');
@@ -157,7 +158,7 @@ function resetSearchVisual() {
     searchInput.style.color = '';
 }
 
-// NEW: Show convert success notification
+// Show convert success notification
 function showConvertSuccess(localPath) {
     const fileName = localPath.split('\\').pop() || localPath.split('/').pop();
     const message = ``;
@@ -167,7 +168,7 @@ function showConvertSuccess(localPath) {
     const searchInput = document.getElementById('searchInput');
     const originalPlaceholder = searchInput.placeholder;
     
-    searchInput.placeholder = '';
+    searchInput.placeholder = '✓ Đã copy đường dẫn';
     searchInput.style.color = 'var(--success-color)';
     
     setTimeout(() => {
@@ -176,12 +177,12 @@ function showConvertSuccess(localPath) {
     }, 2000);
 }
 
-// NEW: Show convert error
+// Show convert error
 function showConvertError() {
     showToast('❌ Lỗi khi copy vào clipboard', 'error');
 }
 
-// NEW: ChatGPT-style minimalist toast notification
+// ChatGPT-style minimalist toast notification
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
@@ -189,7 +190,7 @@ function showToast(message, type = 'info') {
     
     // ChatGPT-style minimalist design
     const colors = {
-        success: '#2563eb', // Blue color like ChatGPT
+        success: '#2563eb',
         error: '#dc2626',
         info: '#2563eb'
     };
@@ -199,7 +200,7 @@ function showToast(message, type = 'info') {
         top: '20px',
         left: '50%',
         transform: 'translateX(-50%) translateY(-100%)',
-        padding: '8px 0',
+        padding: '8px 16px',
         color: colors[type] || colors.info,
         fontSize: '14px',
         fontWeight: '400',
@@ -231,13 +232,13 @@ function showToast(message, type = 'info') {
     }, 2500);
 }
 
-// NEW: Update search title
+// Update search title
 function updateSearchTitle() {
     const searchInput = document.getElementById('searchInput');
     searchInput.title = 'Enter: Tìm kiếm hoặc Convert URL | Ctrl+Enter: Tìm Google';
 }
 
-// Date filter functions (unchanged)
+// Date filter functions (updated for unified search)
 function toggleDateDropdown() {
     const dropdown = document.getElementById('dateDropdown');
     const btn = document.getElementById('dateBtn');
@@ -272,8 +273,9 @@ function selectQuickDate(period, displayText) {
     document.getElementById('dateDropdown').classList.remove('open');
     document.getElementById('dateBtn').classList.remove('open');
     
+    // Use unified search that combines all filters
     if (hasResults) {
-        performSearch();
+        performUnifiedSearch();
     }
 }
 
@@ -324,19 +326,19 @@ function applyCustomDate() {
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
         if (startDate && endDate) {
-            dateFilter = `dm:${startDate}..${endDate}`;
+            dateFilter = `${startDate}..${endDate}`;
             displayText = `${formatInputDate(startDate)} - ${formatInputDate(endDate)}`;
         }
     } else if (dateType === 'after') {
         const afterDate = document.getElementById('afterDate').value;
         if (afterDate) {
-            dateFilter = `dm:>${afterDate}`;
+            dateFilter = `>${afterDate}`;
             displayText = `Sau ${formatInputDate(afterDate)}`;
         }
     } else if (dateType === 'before') {
         const beforeDate = document.getElementById('beforeDate').value;
         if (beforeDate) {
-            dateFilter = `dm:<${beforeDate}`;
+            dateFilter = `<${beforeDate}`;
             displayText = `Trước ${formatInputDate(beforeDate)}`;
         }
     }
@@ -356,8 +358,9 @@ function applyCustomDate() {
         document.getElementById('dateDropdown').classList.remove('open');
         document.getElementById('dateBtn').classList.remove('open');
         
+        // Use unified search
         if (hasResults) {
-            performSearch();
+            performUnifiedSearch();
         }
     }
 }
@@ -391,31 +394,38 @@ function clearDateFilter() {
     document.getElementById('dateDropdown').classList.remove('open');
     document.getElementById('dateBtn').classList.remove('open');
     
+    // Use unified search
     if (hasResults) {
-        performSearch();
+        performUnifiedSearch();
     }
 }
 
+// Enhanced date filter generation - mặc định áp dụng cho tất cả loại ngày
 function getDateFilter() {
     if (!selectedDateFilter || selectedDateFilter === 'all') {
         return '';
     }
     
+    let dateValue = '';
     if (selectedDateFilter === 'custom') {
-        return customDateRange;
+        dateValue = customDateRange;
+    } else {
+        const dateFilters = {
+            'today': 'today',
+            'thisweek': 'thisweek', 
+            'thismonth': 'thismonth',
+            'thisyear': 'thisyear'
+        };
+        dateValue = dateFilters[selectedDateFilter] || '';
     }
     
-    const dateFilters = {
-        'today': 'dm:today',
-        'thisweek': 'dm:thisweek',
-        'thismonth': 'dm:thismonth',
-        'thisyear': 'dm:thisyear'
-    };
+    if (!dateValue) return '';
     
-    return dateFilters[selectedDateFilter] || '';
+    // Mặc định tạo OR condition cho tất cả loại ngày (tạo/sửa/truy cập)
+    return `(dm:${dateValue}|dc:${dateValue}|da:${dateValue})`;
 }
 
-// Drive selector functions (unchanged)
+// Drive selector functions (updated)
 function toggleDrive(drive) {
     const checkbox = document.getElementById(`drive${drive.replace(':', '')}`);
     const driveOption = checkbox.closest('.drive-option');
@@ -430,8 +440,9 @@ function toggleDrive(drive) {
         driveOption.classList.add('active');
     }
     
+    // Use unified search that combines all filters
     if (hasResults) {
-        performSearch();
+        performUnifiedSearch();
     }
 }
 
@@ -442,76 +453,121 @@ function getDriveFilter() {
     return Array.from(selectedDrives).join(' ');
 }
 
-// Main search function (unchanged)
-function performSearch() {
+// MAIN FUNCTION: Unified search function that combines all filters properly
+function performUnifiedSearch() {
     const query = document.getElementById('searchInput').value.trim();
     
-    if (!query) {
+    if (!query && !currentFilter) {
         closeIframe();
         return;
     }
     
+    // Clean user query
     currentUserQuery = cleanUserQuery(query);
     
-    let finalQuery = query;
+    // Build final search query with proper filter combination
+    let searchParts = [];
     
+    // Add drive filter first (space-separated for multiple drives)
     const driveFilter = getDriveFilter();
-    const dateFilter = getDateFilter();
-    
-    let filters = [];
-    if (driveFilter) filters.push(driveFilter);
-    if (dateFilter) filters.push(dateFilter);
-    
-    if (filters.length > 0) {
-        finalQuery = `${filters.join(' ')} ${query}`;
+    if (driveFilter) {
+        searchParts.push(driveFilter);
     }
+    
+    // Add date filter (với OR logic cho tất cả loại ngày)
+    const dateFilter = getDateFilter();
+    if (dateFilter) {
+        searchParts.push(dateFilter);
+    }
+    
+    // Add current quick filter (file type or folder)
+    if (currentFilter) {
+        searchParts.push(currentFilter);
+    }
+    
+    // Add user search query last
+    if (currentUserQuery.trim()) {
+        searchParts.push(currentUserQuery.trim());
+    }
+    
+    // Combine all parts with spaces
+    const finalQuery = searchParts.join(' ');
+    
+    if (!finalQuery.trim()) {
+        closeIframe();
+        return;
+    }
+    
+    console.log('Final Search Query:', finalQuery); // Debug log
     
     const searchUrl = `http://localhost:8080/?s=${encodeURIComponent(finalQuery)}`;
     showInIframe(searchUrl, finalQuery);
 }
 
-// Clean user query by removing filter patterns (unchanged)
+// Clean user query by removing filter patterns
 function cleanUserQuery(query) {
     let cleaned = query;
     
+    // Remove various filter patterns
     cleaned = cleaned.replace(/\*\.[a-zA-Z0-9]+(\|\*\.[a-zA-Z0-9]+)*/g, '');
     cleaned = cleaned.replace(/size:[^\s]+/g, '');
     cleaned = cleaned.replace(/dm:[^\s]+/g, '');
+    cleaned = cleaned.replace(/dc:[^\s]+/g, '');
+    cleaned = cleaned.replace(/da:[^\s]+/g, '');
     cleaned = cleaned.replace(/folder:/g, '');
     cleaned = cleaned.replace(/[A-Z]:/g, '');
+    cleaned = cleaned.replace(/\([^)]*\)/g, ''); // Remove parentheses groups
     cleaned = cleaned.replace(/\s+/g, ' ').trim();
     
     return cleaned;
 }
 
-// Apply quick filter while preserving user query and date filters (unchanged)
+// Apply quick filter with unified search and UI state management  
 function applyQuickFilter(filter) {
     currentFilter = filter;
     
-    let combinedQuery = '';
+    // Update UI to show active quick filter
+    updateQuickFilterUI(filter);
     
-    if (currentUserQuery.trim()) {
-        combinedQuery = `${filter} ${currentUserQuery.trim()}`;
-    } else {
-        combinedQuery = filter;
-    }
-    
-    const driveFilter = getDriveFilter();
-    const dateFilter = getDateFilter();
-    
-    let filters = [];
-    if (driveFilter) filters.push(driveFilter);
-    if (dateFilter) filters.push(dateFilter);
-    
-    if (filters.length > 0) {
-        combinedQuery = `${filters.join(' ')} ${combinedQuery}`;
-    }
-    
-    const searchUrl = `http://localhost:8080/?s=${encodeURIComponent(combinedQuery)}`;
-    showInIframe(searchUrl, combinedQuery);
+    // Use unified search that combines with current drives and date filters
+    performUnifiedSearch();
 }
 
-// Close dropdowns when clicking outside (unchanged)
+// Update quick filter UI state
+function updateQuickFilterUI(activeFilter) {
+    // Remove active class from all quick items
+    document.querySelectorAll('.quick-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Add active class to current filter
+    if (activeFilter) {
+        let targetId = '';
+        if (activeFilter.includes('jpg|png|gif')) targetId = 'quick-images';
+        else if (activeFilter.includes('mp3|mp4|avi')) targetId = 'quick-media';
+        else if (activeFilter.includes('doc|pdf|txt')) targetId = 'quick-documents';
+        else if (activeFilter.includes('folder:')) targetId = 'quick-folders';
+        
+        if (targetId) {
+            document.getElementById(targetId).classList.add('active');
+        }
+    }
+}
+
+// Reset quick filter UI
+function resetQuickFilterUI() {
+    document.querySelectorAll('.quick-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    currentFilter = '';
+}
+
+// Legacy function kept for backward compatibility - now uses unified search
+function performSearch() {
+    performUnifiedSearch();
+}
+
+// Close dropdowns when clicking outside
 function closeDropdownsOnOutsideClick(event) {
     const dateFilter = document.getElementById('dateFilter');
     if (!dateFilter.contains(event.target)) {
@@ -520,7 +576,7 @@ function closeDropdownsOnOutsideClick(event) {
     }
 }
 
-// Search Google with current input (unchanged)
+// Search Google with current input
 function searchGoogleWithCurrentInput() {
     const searchInput = document.getElementById('searchInput');
     const query = searchInput.value.trim();
@@ -533,15 +589,13 @@ function searchGoogleWithCurrentInput() {
     }
 }
 
-// Show results in iframe (unchanged)
+// Show results in iframe
 function showInIframe(url, query) {
     const container = document.getElementById('iframeContainer');
     const iframe = document.getElementById('everythingFrame');
-    const urlDisplay = document.getElementById('iframeUrl');
     
     container.style.display = 'block';
     iframe.src = url;
-    urlDisplay.textContent = url.replace('http://', '');
     
     iframe.onload = function() {
         try {
@@ -568,7 +622,7 @@ function showInIframe(url, query) {
     hasResults = true;
 }
 
-// Fullscreen functionality (unchanged)
+// Fullscreen functionality
 function toggleFullscreen() {
     const container = document.getElementById('iframeContainer');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -592,7 +646,7 @@ function toggleFullscreen() {
     }
 }
 
-// Close iframe (unchanged)
+// Close iframe
 function closeIframe() {
     const container = document.getElementById('iframeContainer');
     const iframe = document.getElementById('everythingFrame');
@@ -607,9 +661,10 @@ function closeIframe() {
     
     hasResults = false;
     currentFilter = '';
+    resetQuickFilterUI();
 }
 
-// URL Converter functions (unchanged from previous version)
+// URL Converter functions
 function openUrlConverter() {
     document.getElementById('urlConverterModal').classList.add('open');
     document.getElementById('urlInput').focus();
@@ -707,7 +762,7 @@ function resetCopyStatus() {
     updateCopyStatus('Ready', false);
 }
 
-// URL Input event listeners (unchanged)
+// URL Input event listeners
 document.getElementById('urlInput').addEventListener('input', function() {
     const pathOutput = document.getElementById('pathOutput');
     const url = this.value.trim();
@@ -729,7 +784,7 @@ document.getElementById('urlInput').addEventListener('keypress', function(e) {
     }
 });
 
-// Keyboard shortcuts (unchanged)
+// Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
@@ -762,7 +817,7 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Close modal when clicking overlay (unchanged)
+// Close modal when clicking overlay
 document.getElementById('urlConverterModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeUrlConverter();
