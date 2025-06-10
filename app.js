@@ -1,11 +1,12 @@
 // Global variables
 let currentUserQuery = '';
 let currentFilter = '';
-let selectedDrives = new Set();
+let selectedDrives = new Set(['D:']); // Default to D: drive only
 let selectedDateFilter = '';
 let customDateRange = '';
 let hasResults = false;
 let isFullscreen = false;
+let searchOnCDrive = false; // New variable to track C: drive selection
 
 // Initialize when page loads
 window.addEventListener('load', () => {
@@ -134,7 +135,7 @@ function updateSearchVisualFeedback(query) {
     if (isLocalhostUrl(query)) {
         // Change to convert icon
         searchIcon.innerHTML = `
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M16.5,11H13V7.5L10.75,9.75L9.33,8.33L13.83,3.83L18.33,8.33L16.91,9.75L14.5,7.5V11H16.5Z"/>
+            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M16.5,11H13V7.5H11V11H7.5V13H11V16.5H13V13H16.5V11Z"/>
         `;
         searchInput.placeholder = 'Nhấn Enter để convert URL';
         searchIcon.style.fill = 'var(--accent-color)';
@@ -425,32 +426,36 @@ function getDateFilter() {
     return `(dm:${dateValue}|dc:${dateValue}|da:${dateValue})`;
 }
 
-// Drive selector functions (updated)
+// Updated drive selector functions - simplified logic
 function toggleDrive(drive) {
-    const checkbox = document.getElementById(`drive${drive.replace(':', '')}`);
-    const driveOption = checkbox.closest('.drive-option');
-    
-    if (selectedDrives.has(drive)) {
-        selectedDrives.delete(drive);
-        checkbox.classList.remove('active');
-        driveOption.classList.remove('active');
-    } else {
-        selectedDrives.add(drive);
-        checkbox.classList.add('active');
-        driveOption.classList.add('active');
-    }
-    
-    // Use unified search that combines all filters
-    if (hasResults) {
-        performUnifiedSearch();
+    if (drive === 'C:') {
+        const checkbox = document.getElementById('driveC');
+        const driveOption = checkbox.closest('.drive-option');
+        
+        searchOnCDrive = !searchOnCDrive;
+        
+        if (searchOnCDrive) {
+            checkbox.classList.add('active');
+            driveOption.classList.add('active');
+        } else {
+            checkbox.classList.remove('active');
+            driveOption.classList.remove('active');
+        }
+        
+        // Use unified search that combines all filters
+        if (hasResults) {
+            performUnifiedSearch();
+        }
     }
 }
 
+// Updated drive filter function - simplified logic
 function getDriveFilter() {
-    if (selectedDrives.size === 0) {
-        return '';
+    if (searchOnCDrive) {
+        return 'C:'; // Search only C: drive when checked
+    } else {
+        return 'D:'; // Default to D: drive when unchecked
     }
-    return Array.from(selectedDrives).join(' ');
 }
 
 // MAIN FUNCTION: Unified search function that combines all filters properly
@@ -468,7 +473,7 @@ function performUnifiedSearch() {
     // Build final search query with proper filter combination
     let searchParts = [];
     
-    // Add drive filter first (space-separated for multiple drives)
+    // Add drive filter first (simplified: only one drive at a time)
     const driveFilter = getDriveFilter();
     if (driveFilter) {
         searchParts.push(driveFilter);
