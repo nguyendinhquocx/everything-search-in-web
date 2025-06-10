@@ -94,17 +94,9 @@
                     </div>
                 </div>
                 
-                <!-- Drive Selector -->
+                <!-- Drive Selector - Simplified to only C: drive toggle -->
                 <div class="drive-selector" id="driveSelector">
-                    <div class="drive-option" data-drive="D:" onclick="toggleDrive('D:')">
-                        <div class="drive-checkbox" id="driveD">
-                            <svg class="check-icon" viewBox="0 0 24 24">
-                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                            </svg>
-                        </div>
-                        <span>D:</span>
-                    </div>
-                    <div class="drive-option" data-drive="C:" onclick="toggleDrive('C:')">
+                    <div class="drive-option" data-drive="C:" onclick="toggleDrive('C:')" title="Bao gồm ổ C: (mặc định chỉ ổ D:)">
                         <div class="drive-checkbox" id="driveC">
                             <svg class="check-icon" viewBox="0 0 24 24">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -116,43 +108,39 @@
             </div>
         </div>
         
-        <!-- Quick Actions -->
+        <!-- Quick Actions - Icons only -->
         <section class="quick-actions" id="quickActions">
             <div class="quick-grid">
-                <a href="#" class="quick-item" onclick="applyQuickFilter('*.jpg|*.png|*.gif|*.webp')" id="quick-images">
+                <a href="#" class="quick-item" onclick="applyQuickFilter('*.jpg|*.png|*.gif|*.webp')" id="quick-images" title="Hình ảnh">
                     <div class="quick-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
                         </svg>
                     </div>
-                    <div class="quick-title">Hình ảnh</div>
                 </a>
                 
-                <a href="#" class="quick-item" onclick="applyQuickFilter('*.mp3|*.mp4|*.avi|*.mkv')" id="quick-media">
+                <a href="#" class="quick-item" onclick="applyQuickFilter('*.mp3|*.mp4|*.avi|*.mkv')" id="quick-media" title="Media">
                     <div class="quick-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
                         </svg>
                     </div>
-                    <div class="quick-title">Media</div>
                 </a>
                 
-                <a href="#" class="quick-item" onclick="applyQuickFilter('*.doc|*.pdf|*.txt|*.docx')" id="quick-documents">
+                <a href="#" class="quick-item" onclick="applyQuickFilter('*.doc|*.pdf|*.txt|*.docx')" id="quick-documents" title="Tài liệu">
                     <div class="quick-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                         </svg>
                     </div>
-                    <div class="quick-title">Tài liệu</div>
                 </a>
                 
-                <a href="#" class="quick-item" onclick="applyQuickFilter('folder:')" id="quick-folders">
+                <a href="#" class="quick-item" onclick="applyQuickFilter('folder:')" id="quick-folders" title="Thư mục">
                     <div class="quick-icon">
                         <svg viewBox="0 0 24 24">
                             <path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z"/>
                         </svg>
                     </div>
-                    <div class="quick-title">Thư mục</div>
                 </a>
             </div>
         </section>
@@ -198,7 +186,7 @@
                         <input type="text" id="urlInput" placeholder="Paste URL và nhấn Enter..." />
                         <button class="paste-btn" onclick="pasteFromClipboard()" title="Paste">
                             <svg viewBox="0 0 24 24">
-                                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V21A2,2 0 0,0 5,23H19A2,2 0 0,0 21,21V4A2,2 0 0,0 19,2Z"/>
+                                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
                             </svg>
                         </button>
                     </div>
